@@ -1,0 +1,1 @@
+import{r,k as _,_ as e}from"./q-CjwKLAwo.js";function i(o,s,t){const a=(s-1)*t,n=a+t;return o.slice(a,n)}const d=r(_(()=>e(()=>import("./q-Chwy4ceS.js"),[]),"s_MvbVP0bRLA8"));export{i as _auto_paginateData,d as default};

@@ -1,0 +1,1 @@
+import{M as s,O as a,E as n,H as x}from"./q-CjwKLAwo.js";const c=l=>s("section",null,{class:a(p=>p.class,[l])},s("div",null,{class:"max-wrapper px-6 py-16 md:px-10 md:py-16 lg:px-10 lg:py-20 xl:px-[120px]"},n(x,null,3,"hs_0"),1,null),1,"hs_1");export{c as s_saY5gHcKxwE};
