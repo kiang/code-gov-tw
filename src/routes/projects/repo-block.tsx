@@ -1,4 +1,4 @@
-import { component$ } from "@builder.io/qwik";
+import { component$, $ } from "@builder.io/qwik";
 import ArrowRightIcon from "~/media/icons/arrow-right-icon.svg?jsx";
 import LabelButton from "./label";
 import Link from "~/components/link";
@@ -24,6 +24,13 @@ export const RepoBlock = component$(
     techStacks?: { name: string }[];
     id: number;
   }) => {
+    const handleLinkLoading = $((e: Event) => {
+      const target = e.target as HTMLElement;
+      const spinner = target.querySelector(".spinner-gray");
+      if (!spinner) return;
+      spinner.classList.remove("hidden");
+    });
+
     const mainCopyrightOwnerString = $localize`提供單位：`;
     return (
       <div class="flex flex-col rounded-[6px] border border-gray-400 bg-white lg:flex-row">
@@ -68,18 +75,23 @@ export const RepoBlock = component$(
             </div>
           </div>
         </div>
-        <Link class="flex-shrink-0 lg:h-full lg:min-w-40" href={`${id}`}>
+        <Link
+          class="flex-shrink-0 lg:h-full lg:min-w-40"
+          href={`${id}`}
+          onClick$={handleLinkLoading}
+        >
           <div
             class={[
               "flex h-20 w-full justify-center rounded-b-[5px] bg-gray-500 lg:h-full lg:rounded-b-none lg:rounded-e-[5px]",
               "transition-colors duration-[50ms] ease-out hover:bg-gray-600",
             ]}
           >
-            <div class="flex items-center justify-center gap-2">
+            <div class="relative flex items-center justify-center gap-2">
               <div class="font-normal text-white">{$localize`更多細節`}</div>
               <div class="text-white">
                 <ArrowRightIcon class="h-6 w-6" />
               </div>
+              <div class="spinner-gray absolute hidden"></div>
             </div>
           </div>
         </Link>

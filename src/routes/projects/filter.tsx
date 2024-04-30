@@ -5,6 +5,7 @@ type FilterProps = {
   categoryName: string;
   filterOptions: string[];
   store?: any;
+  spinnerController?: any;
 };
 
 export default component$<FilterProps>((props) => {
@@ -13,10 +14,22 @@ export default component$<FilterProps>((props) => {
     filters: new Set(),
   });
 
+  useTask$(() => {
+    // restore checkbox state from store
+    if (props.store[props.filterName]) {
+      state.filters = new Set(props.store[props.filterName]);
+      filterSize.value = state.filters.size;
+    }
+  });
+
   useTask$(({ track }) => {
     track(() => filterSize.value);
     props.store[props.filterName] = Array.from(state.filters);
   });
+
+  const isOptionChecked = (option: string, filters: string[]) => {
+    return filters.indexOf(option) !== -1;
+  };
 
   const handleFilterChange = $((e: Event) => {
     const target = e.target as HTMLElement;
@@ -80,7 +93,7 @@ export default component$<FilterProps>((props) => {
           return (
             <div
               key={option}
-              class="flex cursor-pointer items-center gap-4"
+              class="relative flex cursor-pointer items-center gap-4"
               onClick$={handleFilterChange}
             >
               <input
@@ -92,10 +105,20 @@ export default component$<FilterProps>((props) => {
                 type="checkbox"
                 value={option}
                 onChange$={handleFilterChange}
+                checked={isOptionChecked(option, props.store[props.filterName])}
               />
               <label for={option} class="pointer-events-none">
                 {option}
               </label>
+              <div
+                id="spinner"
+                class={[
+                  "pointer-events-none absolute right-2",
+                  props.spinnerController === "hidden" ? "!hidden" : "block",
+                ]}
+              >
+                <div class="spinner" />
+              </div>
             </div>
           );
         })}

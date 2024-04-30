@@ -45,18 +45,22 @@ export const PageNav = component$<PageNavProps>(
   ({ currentPage, itemsPerPage, totalItems }) => {
     const totalPage = Math.ceil(totalItems / itemsPerPage);
 
-    const handleNextPage = $(() => {
+    const handleNextPage = $((e: Event) => {
       if (currentPage.value * itemsPerPage >= totalItems) {
         return;
       }
+      const target = e.target as HTMLButtonElement;
+      const spinner = target.querySelector(".spinner");
+      if (spinner) spinner.classList.remove("hidden");
       currentPage.value++;
-      window.scrollTo({ top: 0, behavior: "smooth" });
     });
 
-    const handlePrevPage = $(() => {
+    const handlePrevPage = $((e: Event) => {
       if (currentPage.value === 1) return;
       currentPage.value--;
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      const target = e.target as HTMLButtonElement;
+      const spinner = target.querySelector(".spinner");
+      if (spinner) spinner.classList.remove("hidden");
     });
 
     const generatePageList = () => {
@@ -66,15 +70,18 @@ export const PageNav = component$<PageNavProps>(
         <button
           key={index}
           class={[
+            "page-number",
             "group relative w-10 font-medium hover:text-brand-secondary",
             currentPage.value === page
               ? "text-brand-secondary"
               : "text-gray-300",
             "transition-colors duration-[50ms] ease-out",
           ]}
-          onClick$={() => {
+          onClick$={(e: Event) => {
+            const target = e.target as HTMLButtonElement;
+            const spinner = target.querySelector(".spinner");
+            if (spinner) spinner.classList.remove("hidden");
             currentPage.value = page;
-            window.scrollTo({ top: 0, behavior: "smooth" });
           }}
           disabled={page === -1}
         >
@@ -88,6 +95,7 @@ export const PageNav = component$<PageNavProps>(
               "transition-colors duration-[50ms] ease-out",
             ]}
           ></span>
+          <span class="spinner pointer-events-none absolute right-2 hidden"></span>
         </button>
       ));
     };
@@ -100,9 +108,13 @@ export const PageNav = component$<PageNavProps>(
           ]}
           onClick$={handlePrevPage}
         >
-          <div class="flex gap-3">
+          <div class="pointer-events-none relative flex gap-3">
             <ArrowLeftIcon class="w-5" />
             <div class="text-sm font-medium">{$localize`上一頁`}</div>
+            <div
+              id="spinner-prev"
+              class="spinner absolute bottom-0 right-3 hidden"
+            ></div>
           </div>
         </button>
 
@@ -117,9 +129,13 @@ export const PageNav = component$<PageNavProps>(
           onClick$={handleNextPage}
           disabled={currentPage.value * itemsPerPage >= totalItems}
         >
-          <div class="flex gap-3">
+          <div class="pointer-events-none relative flex gap-3">
             <div class="text-sm font-medium">{$localize`下一頁`}</div>
             <ArrowRightIcon class="w-5" />
+            <div
+              id="spinner-next"
+              class="spinner absolute bottom-0 left-3 hidden"
+            ></div>
           </div>
         </button>
       </div>

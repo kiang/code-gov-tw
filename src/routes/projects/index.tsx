@@ -4,6 +4,7 @@ import {
   useSignal,
   useStore,
   useComputed$,
+  useOnDocument,
 } from "@builder.io/qwik";
 import Section from "~/components/section";
 import { RepoBlock } from "~/routes/projects/repo-block";
@@ -37,6 +38,9 @@ export default component$(() => {
     projects: localProjects,
   });
 
+  const projectListRef = useSignal<Element>();
+  const spinnerController = useSignal("visible");
+
   const filterStore = useStore({
     features: [],
     repoOwners: [],
@@ -59,7 +63,51 @@ export default component$(() => {
     },
   );
 
-  const handleMobileFilter = $(() => (filter.value = !filter.value));
+  const handleMobileFilter = $((e: Event) => {
+    filter.value = !filter.value;
+    const target = e.target as HTMLElement;
+    const targetSpinner = target.querySelector(".spinner-more");
+    if (targetSpinner) targetSpinner.classList.toggle("hidden");
+  });
+
+  useOnDocument(
+    "readystatechange",
+    $(() => {
+      // Options for the observer (which mutations to observe)
+      const config = { childList: true, subtree: true };
+
+      // Callback function to execute when mutations are observed
+      const callback = (mutationList: string | any[]) => {
+        if (mutationList.length > 0) {
+          spinnerController.value = "hidden";
+
+          window.scrollTo({ top: 0, behavior: "smooth" });
+          document.querySelector("#spinner-next")?.classList.add("hidden");
+          document.querySelector("#spinner-prev")?.classList.add("hidden");
+          const spinners = document.querySelectorAll(".page-number > .spinner");
+          for (const spinner of spinners) {
+            spinner.classList.add("hidden");
+          }
+
+          // Reset current page if total items is less than items per page
+          if (computedProjects.value.total < itemsPerPage) {
+            currentPage.value = 1;
+          } else if (
+            currentPage.value * itemsPerPage >=
+            computedProjects.value.total
+          ) {
+            currentPage.value = Math.ceil(
+              computedProjects.value.total / itemsPerPage,
+            );
+          }
+        }
+      };
+      // Create an observer instance linked to the callback function
+      const observer = new MutationObserver(callback);
+      if (!projectListRef.value) return;
+      observer.observe(projectListRef.value, config);
+    }),
+  );
 
   return (
     <>
@@ -71,16 +119,18 @@ export default component$(() => {
           </div>
         </Section>
       ) : (
-        <div class="sticky top-0 flex items-center justify-between bg-white p-6 md:hidden">
+        <div class="sticky top-0 z-10 flex items-center justify-between bg-white p-6 md:hidden">
           <h3>{$localize`設定篩選條件`}</h3>
           <button
             class={[
               "flex items-center justify-center gap-4 rounded-md border border-primary bg-white px-3.5 py-2.5 text-base font-semibold text-primary shadow-sm",
               "hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600",
+              "relative",
             ]}
             onClick$={handleMobileFilter}
           >
             {$localize`完成`}
+            <span class="spinner-more pointer-events-none absolute hidden"></span>
           </button>
         </div>
       )}
@@ -99,6 +149,7 @@ export default component$(() => {
                 q:slot="icon-right"
                 class="h-5 w-5 text-primary-700"
               />
+              <span class="spinner-more pointer-events-none absolute hidden"></span>
             </button>
           )}
           <div
@@ -110,18 +161,21 @@ export default component$(() => {
               categoryName={$localize`功能類型`}
               filterOptions={filters.features}
               store={filterStore}
+              spinnerController={spinnerController.value}
             />
             <Filter
               filterName="repoOwners"
               categoryName={$localize`提供單位`}
               filterOptions={filters.repoOwners}
               store={filterStore}
+              spinnerController={spinnerController.value}
             />
             <Filter
               filterName="techStacks"
               categoryName={$localize`使用技術`}
               filterOptions={filters.techStacks}
               store={filterStore}
+              spinnerController={spinnerController.value}
             />
           </div>
           {filter.value ? (
@@ -131,25 +185,32 @@ export default component$(() => {
             >
               <Filter
                 filterName="features"
-                categoryName={$localize`包含系統功能`}
+                categoryName={$localize`功能類型`}
                 filterOptions={filters.features}
                 store={filterStore}
+                spinnerController={"hidden"}
               />
               <Filter
                 filterName="repoOwners"
                 categoryName={$localize`提供單位`}
                 filterOptions={filters.repoOwners}
                 store={filterStore}
+                spinnerController={"hidden"}
               />
               <Filter
                 filterName="techStacks"
                 categoryName={$localize`使用技術`}
                 filterOptions={filters.techStacks}
                 store={filterStore}
+                spinnerController={"hidden"}
               />
             </div>
           ) : (
-            <div id="projects" class="flex w-full flex-col gap-8">
+            <div
+              id="projects"
+              class="flex w-full flex-col gap-8"
+              ref={projectListRef}
+            >
               {computedProjects.value.data.map((project) => {
                 const projectName =
                   project.description["zh-Hant"].localisedName || project.name;
