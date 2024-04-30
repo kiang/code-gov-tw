@@ -1,0 +1,1 @@
+import{M as e}from"./q-DrXn6jmZ.js";const i="/build/q-BOVPrRp4.webp 200w, /build/q-Dtgmz03N.webp 400w, /build/q-BTbntXpU.webp 480w",d=480,o=480,c={srcSet:i,width:d,height:o};function r(n,t,s,b){return e("img",{decoding:"async",loading:"lazy",...n},c,void 0,3,t)}export{r as W};

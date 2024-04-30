@@ -1,0 +1,1 @@
+import{L as r}from"./q-BtKPLzMG.js";import{x as a,E as i,H as c}from"./q-DrXn6jmZ.js";const e=s=>{const t=a(s,["isActive"]);return i(r,{...t,class:[t.class??"",s.isActive?"text-xl":""],children:i(c,null,3,"O3_0")},0,"O3_1")};export{e as s_8aSv0TvUy3k};

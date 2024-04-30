@@ -1,0 +1,1 @@
+import{M as n,E as r,H as a}from"./q-DrXn6jmZ.js";const l=()=>n("div",null,{class:"rounded-2xl border border-brand-secondary p-1 px-2"},n("div",null,{class:"whitespace-nowrap text-[10px] font-normal text-brand-secondary"},r(a,null,3,"aH_0"),1,null),1,"aH_1");export{l as s_634GEdv5WMY};
